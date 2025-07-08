@@ -1,0 +1,49 @@
+{
+  "name": "mcp-weather-extension",
+  "displayName": "MCP Weather Extension",
+  "description": "VS Code extension that integrates with MCP weather server",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:weather.insertCurrent",
+    "onCommand:weather.showWeather"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "weather.insertCurrent",
+        "title": "Insert Current Weather"
+      },
+      {
+        "command": "weather.showWeather",
+        "title": "Show Weather"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "weather.insertCurrent",
+        "key": "ctrl+shift+w",
+        "mac": "cmd+shift+w"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0"
+  }
+}

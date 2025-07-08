@@ -162,6 +162,20 @@ class MyService {
 server.tool("myTool", "Description", schema, handler);
 ```
 
+## 🤖 AI Assistant Integration
+
+### Claude Desktop (Available Now)
+Your MCP server works with Claude Desktop out of the box! See [`docs/AI_INTEGRATION.md`](docs/AI_INTEGRATION.md) for setup instructions.
+
+### GitHub Copilot (Coming Soon)
+GitHub Copilot doesn't support MCP yet, but your server is ready! See [`docs/GITHUB_COPILOT_INTEGRATION.md`](docs/GITHUB_COPILOT_INTEGRATION.md) for:
+- Current workarounds using VS Code extensions
+- What to expect when MCP support is added
+- Example integration patterns
+
+### VS Code Extension Example
+Check out [`examples/vscode-extension/`](examples/vscode-extension/) for a working example that integrates your MCP server with VS Code today!
+
 ## 🔍 MCP Inspector Integration
 
 For debugging and development, you can use the MCP Inspector:
