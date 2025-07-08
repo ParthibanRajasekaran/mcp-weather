@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/weather/main.js",
-    "dev": "tsx weather/main.ts",
+    "start": "node dist/src/main.js",
+    "dev": "tsx src/main.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["mcp", "weather", "api", "typescript", "model-context-protocol"],

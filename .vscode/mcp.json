@@ -1,12 +1,12 @@
 {
     "servers": {
-        "my-weather-server": {
+        "mcp-data-server": {
             "type": "stdio",
             "command": "npx",
             "args": [
                 "-y",
                 "tsx",
-                "weather/main.ts"
+                "src/main.ts"
             ]
         }
     }
