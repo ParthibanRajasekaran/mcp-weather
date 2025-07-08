@@ -1,15 +1,15 @@
-# MCP Weather Server 🌤️
+# MCP Data Server �
 
-A Model Context Protocol (MCP) server that provides real-time weather data for any city worldwide using the Open-Meteo API.
+A comprehensive Model Context Protocol (MCP) server that provides various data services, starting with real-time weather data and designed for easy extension to other data sources.
 
 ## 🚀 Features
 
+- **Modular Architecture**: Easy to extend with new data services
 - **Real-time Weather Data**: Get current weather conditions for any city
 - **MCP Protocol Compliance**: Fully compatible with the Model Context Protocol
-- **Error Handling**: Graceful handling of invalid city names
 - **TypeScript Support**: Written in TypeScript for better type safety
 - **Stdio Transport**: Uses standard input/output for communication
-- **Geocoding Integration**: Automatically resolves city names to coordinates
+- **Extensible Design**: Ready for news, finance, sports, and other data services
 
 ## 📋 Prerequisites
 
@@ -57,20 +57,22 @@ Add the following configuration to your MCP client's configuration file (`.vscod
 ```json
 {
     "servers": {
-        "my-weather-server": {
+        "mcp-data-server": {
             "type": "stdio",
             "command": "npx",
             "args": [
                 "-y",
                 "tsx",
-                "weather/main.ts"
+                "src/main.ts"
             ]
         }
     }
 }
 ```
 
-### Available Tools
+## 🔧 Available Services
+
+### Weather Service
 
 #### `getWeather`
 Get current weather data for a specified city.
@@ -103,7 +105,35 @@ const weather = await mcpClient.callTool("getWeather", { city: "London" });
 }
 ```
 
+### 🔮 Future Services (Planned)
+
+- **News Service**: Get latest news from various sources
+- **Finance Service**: Stock prices, market data, cryptocurrency
+- **Sports Service**: Live scores, team statistics, schedules
+- **Social Media Service**: Trending topics, social metrics
+- **Maps Service**: Location data, directions, places
+
 ## 🏗️ Architecture
+
+### Project Structure
+
+```
+mcp-weather/
+├── src/
+│   ├── main.ts              # Main server entry point
+│   ├── services/            # Data service implementations
+│   │   └── weather.ts       # Weather service
+│   ├── types/               # TypeScript type definitions
+│   │   ├── weather.ts       # Weather-related types
+│   │   └── service.ts       # Base service interfaces
+│   └── utils/               # Utility functions
+│       └── registry.ts      # Service registry
+├── .vscode/
+│   └── mcp.json            # MCP client configuration
+├── package.json            # Project dependencies and scripts
+├── tsconfig.json           # TypeScript configuration
+└── README.md              # This file
+```
 
 ### Transport Layer
 The server uses **StdioServerTransport** for communication:
@@ -112,7 +142,28 @@ The server uses **StdioServerTransport** for communication:
 - **Protocol**: JSON-RPC over stdio
 - **Benefits**: Simple, reliable, and widely supported
 
-### MCP Inspector Integration
+### Service Architecture
+
+Each service follows this pattern:
+
+```typescript
+// 1. Define types
+interface ServiceInput { /* ... */ }
+interface ServiceOutput { /* ... */ }
+
+// 2. Create service class
+class MyService {
+    async getData(input: ServiceInput): Promise<string> {
+        // Implementation
+    }
+}
+
+// 3. Register with MCP server
+server.tool("myTool", "Description", schema, handler);
+```
+
+## 🔍 MCP Inspector Integration
+
 For debugging and development, you can use the MCP Inspector:
 
 1. Install the MCP Inspector:
@@ -122,98 +173,87 @@ npm install -g @modelcontextprotocol/inspector
 
 2. Run the inspector:
 ```bash
-npx @modelcontextprotocol/inspector npx tsx weather/main.ts
+npx @modelcontextprotocol/inspector npx tsx src/main.ts
 ```
 
 3. Open the inspector in your browser at `http://localhost:5173`
 
-### Data Flow
-
-```mermaid
-graph TB
-    A[MCP Client] --> B[StdioServerTransport]
-    B --> C[MCP Weather Server]
-    C --> D[Geocoding API]
-    C --> E[Open-Meteo API]
-    D --> F[City Coordinates]
-    E --> G[Weather Data]
-    F --> E
-    G --> C
-    C --> B
-    B --> A
-```
-
-## 📁 Project Structure
-
-```
-mcp-weather/
-├── weather/
-│   └── main.ts          # Main server implementation
-├── .vscode/
-│   └── mcp.json         # MCP client configuration
-├── package.json         # Project dependencies and scripts
-├── tsconfig.json        # TypeScript configuration
-├── README.md           # This file
-└── .gitignore          # Git ignore rules
-```
-
-## 🔧 Configuration
-
-### Environment Variables
-Currently, no environment variables are required as the server uses free APIs.
-
-### TypeScript Configuration
-The project uses modern TypeScript settings:
-- **Target**: ES2022
-- **Module**: ESNext
-- **Strict Mode**: Enabled
-- **Output**: `./dist` directory
-
-### API Endpoints
-- **Geocoding**: `https://geocoding-api.open-meteo.com/v1/search`
-- **Weather**: `https://api.open-meteo.com/v1/forecast`
-
 ## 🧪 Development
 
-### Running Tests
-```bash
-npm test
+### Adding New Services
+
+1. **Create Type Definitions** (`src/types/myservice.ts`):
+```typescript
+export interface MyServiceInput {
+    query: string;
+}
+
+export const MyServiceSchema = z.object({
+    query: z.string().describe("Your query parameter")
+});
+```
+
+2. **Implement Service** (`src/services/myservice.ts`):
+```typescript
+export class MyService {
+    async getData(input: MyServiceInput): Promise<string> {
+        // Your implementation
+        return "Service response";
+    }
+}
+```
+
+3. **Register Tool** (in `src/main.ts`):
+```typescript
+server.tool(
+    "myTool",
+    "Description of my tool",
+    MyServiceSchema,
+    async ({ query }: { query: string }) => {
+        const result = await myService.getData({ query });
+        return {
+            content: [{ type: "text", text: result }]
+        };
+    }
+);
 ```
 
 ### Development Scripts
 - `npm run dev` - Run in development mode with hot reload
 - `npm run build` - Build the TypeScript project
 - `npm start` - Run the built project
-
-### Debugging
-1. Use the MCP Inspector (see above)
-2. Check logs in the terminal where the server is running
-3. Verify MCP client configuration
+- `npm test` - Run tests (when implemented)
 
 ## 🌐 API Details
 
-### Geocoding API
-- **Service**: Open-Meteo Geocoding API
-- **Rate Limit**: Free tier, no authentication required
-- **Response**: City coordinates and metadata
-
-### Weather API
-- **Service**: Open-Meteo Weather API
+### Weather Service API
+- **Geocoding**: `https://geocoding-api.open-meteo.com/v1/search`
+- **Weather**: `https://api.open-meteo.com/v1/forecast`
 - **Rate Limit**: Free tier, no authentication required
 - **Model**: UKMO Seamless (UK Met Office)
-- **Data**: Current conditions and hourly forecasts
 
 ## 🤝 Contributing
 
+We welcome contributions for new data services! Here's how:
+
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+2. Create a feature branch: `git checkout -b feature/new-service`
+3. Add your service following the architecture above
+4. Add tests and documentation
+5. Commit your changes: `git commit -m 'Add new service'`
+6. Push to the branch: `git push origin feature/new-service`
+7. Open a Pull Request
+
+### Service Guidelines
+- Each service should be self-contained in its own file
+- Use TypeScript for type safety
+- Include proper error handling
+- Add JSDoc comments for public methods
+- Follow the existing code style
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -231,15 +271,15 @@ If you encounter any issues or have questions:
 ## 🔄 Changelog
 
 ### v1.0.0
-- Initial release
-- Basic weather data retrieval
+- Initial release with weather service
+- Modular architecture for easy extension
 - MCP protocol compliance
 - TypeScript implementation
 - Stdio transport support
 
 ---
 
-Made with ❤️ by [ParthibanRajasekaran](https://github.com/ParthibanRajasekaran)
+Made with ❤️ by [ParthibanRajasekaran](https://github.com/ParthibanRajasekaran) | Ready for extension to any data service!
 const server = new McpServer({
     name: "MCP Weather Server",
     version: "1.0.0",
