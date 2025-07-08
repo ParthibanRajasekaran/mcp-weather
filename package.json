@@ -1,0 +1,33 @@
+{
+  "name": "mcp-weather",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/weather/main.js",
+    "dev": "tsx weather/main.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["mcp", "weather", "api", "typescript", "model-context-protocol"],
+  "author": "Parthiban Rajasekaran <rajasekaran.parthiban7@gmail.com>",
+  "license": "ISC",
+  "description": "A Model Context Protocol (MCP) server that provides real-time weather data",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ParthibanRajasekaran/mcp-weather.git"
+  },
+  "homepage": "https://github.com/ParthibanRajasekaran/mcp-weather",
+  "bugs": {
+    "url": "https://github.com/ParthibanRajasekaran/mcp-weather/issues"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.15.0",
+    "zod": "^3.25.74"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tsx": "^4.0.0",
+    "@types/node": "^20.0.0"
+  }
+}
