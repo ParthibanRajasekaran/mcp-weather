@@ -7,9 +7,22 @@
     "build": "tsc",
     "start": "node dist/src/main.js",
     "dev": "tsx src/main.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:integration": "jest --testPathPattern=integration",
+    "test:unit": "jest --testPathPattern=unit",
+    "test:acceptance": "jest --testPathPattern=acceptance",
+    "test:performance": "jest --testPathPattern=performance --runInBand",
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:acceptance"
   },
-  "keywords": ["mcp", "weather", "api", "typescript", "model-context-protocol"],
+  "keywords": [
+    "mcp",
+    "weather",
+    "api",
+    "typescript",
+    "model-context-protocol"
+  ],
   "author": "Parthiban Rajasekaran <rajasekaran.parthiban7@gmail.com>",
   "license": "ISC",
   "description": "A Model Context Protocol (MCP) server that provides real-time weather data",
@@ -26,8 +39,11 @@
     "zod": "^3.25.74"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.0",
     "tsx": "^4.0.0",
-    "@types/node": "^20.0.0"
+    "typescript": "^5.0.0"
   }
 }

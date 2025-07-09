@@ -6,15 +6,25 @@ export class WeatherService {
 
     async getWeather(input: WeatherInput): Promise<string> {
         try {
+            // Validate input
+            if (!input.city || input.city.trim() === '') {
+                return 'Error: City name cannot be empty';
+            }
+
             // Geocoding
             const geocodeResponse = await fetch(
-                `${WeatherService.GEOCODING_API}?name=${input.city}&count=10&language=en&format=json`
+                `${WeatherService.GEOCODING_API}?name=${input.city}&count=1&language=en&format=json`
             );
+            
+            if (!geocodeResponse.ok) {
+                return `Error fetching location data: ${geocodeResponse.status} ${geocodeResponse.statusText}`;
+            }
+            
             const geocodeData: GeocodingResult = await geocodeResponse.json();
 
             // Handle city not found
             if (!geocodeData.results || geocodeData.results.length === 0) {
-                return `No results found for city: ${input.city}. Please try another city.`;
+                return `Error: City "${input.city}" not found. Please check the spelling and try again.`;
             }
 
             // Get weather data
@@ -22,11 +32,16 @@ export class WeatherService {
             const weatherResponse = await fetch(
                 `${WeatherService.WEATHER_API}?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m&models=ukmo_seamless&current=temperature_2m,apparent_temperature,is_day,rain`
             );
+            
+            if (!weatherResponse.ok) {
+                return `Error fetching weather data: ${weatherResponse.status} ${weatherResponse.statusText}`;
+            }
+            
             const weatherData: WeatherData = await weatherResponse.json();
 
             return JSON.stringify(weatherData, null, 2);
         } catch (error) {
-            return `Error retrieving weather data: ${error instanceof Error ? error.message : 'Unknown error'}`;
+            return `Error retrieving weather: ${error instanceof Error ? error.message : 'Unknown error'}`;
         }
     }
 }

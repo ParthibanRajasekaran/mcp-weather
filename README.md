@@ -236,7 +236,9 @@ server.tool(
 - `npm run dev` - Run in development mode with hot reload
 - `npm run build` - Build the TypeScript project
 - `npm start` - Run the built project
-- `npm test` - Run tests (when implemented)
+- `npm test` - Run all tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Run tests with coverage report
 
 ## 🌐 API Details
 

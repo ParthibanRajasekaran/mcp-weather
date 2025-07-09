@@ -142,6 +142,107 @@ export const SportsSchema = z.object({
 6. **Environment Variables**: Use environment variables for API keys
 7. **Testing**: Write unit tests for your service methods
 
+## Testing Your Service
+
+### 1. Unit Tests (`tests/services/myservice.test.ts`)
+
+```typescript
+import { MyService } from '../../src/services/myservice.js';
+
+describe('MyService', () => {
+  let service: MyService;
+
+  beforeEach(() => {
+    service = new MyService();
+    jest.clearAllMocks();
+  });
+
+  describe('getData', () => {
+    it('should return data for valid input', async () => {
+      // Mock the API response
+      const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ data: 'test result' })
+      } as Response);
+
+      const result = await service.getData({ query: 'test' });
+      
+      expect(result).toContain('test result');
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle API errors', async () => {
+      const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error'
+      } as Response);
+
+      const result = await service.getData({ query: 'test' });
+      
+      expect(result).toContain('Error');
+    });
+
+    it('should handle network errors', async () => {
+      const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+
+      const result = await service.getData({ query: 'test' });
+      
+      expect(result).toContain('Error retrieving data');
+      expect(result).toContain('Network error');
+    });
+  });
+});
+```
+
+### 2. Schema Tests (`tests/types/myservice.test.ts`)
+
+```typescript
+import { MyServiceSchema } from '../../src/types/myservice.js';
+
+describe('MyServiceSchema', () => {
+  it('should validate correct input', () => {
+    const validInput = { query: 'test query' };
+    const result = MyServiceSchema.safeParse(validInput);
+    
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data).toEqual(validInput);
+    }
+  });
+
+  it('should reject invalid input', () => {
+    const invalidInput = { query: 123 }; // Should be string
+    const result = MyServiceSchema.safeParse(invalidInput);
+    
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject empty query', () => {
+    const invalidInput = { query: '' };
+    const result = MyServiceSchema.safeParse(invalidInput);
+    
+    expect(result.success).toBe(false);
+  });
+});
+```
+
+### 3. Run Your Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run only your service tests
+npx jest tests/services/myservice.test.ts
+
+# Run with coverage
+npm run test:coverage
+```
+
 ## Adding Environment Variables
 
 If your service needs API keys, add them to a `.env` file:

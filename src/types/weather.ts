@@ -26,7 +26,7 @@ export interface GeocodingResult {
 }
 
 export const WeatherSchema = z.object({
-    city: z.string().describe("The city to get the weather for")
+    city: z.string().min(1, "City name cannot be empty").describe("The city to get the weather for")
 });
 
 export type WeatherInput = z.infer<typeof WeatherSchema>;
