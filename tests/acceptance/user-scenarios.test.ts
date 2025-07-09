@@ -78,7 +78,8 @@ describe('MCP Server Acceptance Tests', () => {
       const responseText = (result.content as any)[0].text;
       expect(responseText).toContain('Error');
       expect(responseText).toContain('not found');
-      expect(responseText).toContain(invalidCity);
+      // Security: Don't echo back potentially malicious user input
+      expect(responseText).not.toContain(invalidCity);
     });
 
     it('As a user, I want to get weather for cities with special characters', async () => {

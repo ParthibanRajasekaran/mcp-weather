@@ -4,16 +4,29 @@ export class WeatherService {
     private static readonly GEOCODING_API = "https://geocoding-api.open-meteo.com/v1/search";
     private static readonly WEATHER_API = "https://api.open-meteo.com/v1/forecast";
 
+    private sanitizeInput(input: string): string {
+        // Remove potentially dangerous characters and limit length
+        return input
+            .replace(/[<>'";&()]/g, '') // Remove dangerous characters
+            .trim()
+            .substring(0, 100); // Limit length
+    }
+
     async getWeather(input: WeatherInput): Promise<string> {
         try {
-            // Validate input
+            // Validate and sanitize input
             if (!input.city || input.city.trim() === '') {
                 return 'Error: City name cannot be empty';
             }
 
+            const sanitizedCity = this.sanitizeInput(input.city);
+            if (sanitizedCity === '') {
+                return 'Error: Invalid city name provided';
+            }
+
             // Geocoding
             const geocodeResponse = await fetch(
-                `${WeatherService.GEOCODING_API}?name=${input.city}&count=1&language=en&format=json`
+                `${WeatherService.GEOCODING_API}?name=${encodeURIComponent(sanitizedCity)}&count=1&language=en&format=json`
             );
             
             if (!geocodeResponse.ok) {
@@ -24,7 +37,7 @@ export class WeatherService {
 
             // Handle city not found
             if (!geocodeData.results || geocodeData.results.length === 0) {
-                return `Error: City "${input.city}" not found. Please check the spelling and try again.`;
+                return 'Error: City not found. Please check the spelling and try again.';
             }
 
             // Get weather data

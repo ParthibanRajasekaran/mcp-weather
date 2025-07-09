@@ -81,7 +81,7 @@ describe('WeatherService', () => {
 
       const result = await weatherService.getWeather({ city: 'NonExistentCity' });
 
-      expect(result).toContain('Error: City "NonExistentCity" not found');
+      expect(result).toContain('Error: City not found');
       expect(mockFetch).toHaveBeenCalledTimes(1);
     });
 
