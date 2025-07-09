@@ -3,7 +3,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { WeatherService } from "./services/weather.js";
 
-const server = new McpServer({
+export const server = new McpServer({
     name: "MCP Data Server",
     version: "1.0.0",
     description: "A comprehensive Model Context Protocol server providing various data services"
@@ -34,10 +34,20 @@ server.tool(
 // server.tool("getNews", "Get latest news", NewsSchema, async (input) => { ... });
 // server.tool("getStocks", "Get stock prices", StockSchema, async (input) => { ... });
 
+
 const transport = new StdioServerTransport();
 
-async function main() {
+export async function main() {
     await server.connect(transport);
 }
 
-main().catch(console.error);
+// Simple entrypoint check that works in all environments
+// Check if this module is being executed directly vs imported
+const isMainModule = () => {
+    // Simple heuristic: if we're in a test environment, don't auto-run
+    return process.env.NODE_ENV !== 'test' && process.env.JEST_WORKER_ID === undefined;
+};
+
+if (isMainModule()) {
+    main().catch(console.error);
+}

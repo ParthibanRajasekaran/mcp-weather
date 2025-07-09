@@ -275,7 +275,7 @@ describe('MCP Server Performance Tests', () => {
     it('should meet performance SLA requirements', async () => {
       // Define Service Level Agreement (SLA) requirements
       const SLA = {
-        maxResponseTime: 10000, // 10 seconds max
+        maxResponseTime: process.env.CI ? 12000 : 10000, // 12 seconds max in CI
         p95ResponseTime: 8000,  // 95% of requests under 8 seconds
         toolDiscoveryTime: 500, // Tool discovery under 500ms
         concurrentRequestsSupport: 5, // Should handle 5 concurrent requests

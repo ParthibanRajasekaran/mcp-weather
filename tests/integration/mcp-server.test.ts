@@ -65,11 +65,14 @@ describe('MCP Server Integration Tests', () => {
       expect((result.content as any)[0]).toHaveProperty('type', 'text');
       expect((result.content as any)[0]).toHaveProperty('text');
       
-      // Parse the weather data
+      // Parse the weather data, but only if it's valid JSON
       const weatherText = (result.content as any)[0].text;
-      expect(() => JSON.parse(weatherText)).not.toThrow();
-      
-      const weatherData = JSON.parse(weatherText);
+      let weatherData;
+      try {
+        weatherData = JSON.parse(weatherText);
+      } catch (e) {
+        throw new Error(`Weather tool did not return valid JSON: ${weatherText}`);
+      }
       expect(weatherData).toHaveProperty('latitude');
       expect(weatherData).toHaveProperty('longitude');
       expect(weatherData).toHaveProperty('current');

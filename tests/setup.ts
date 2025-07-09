@@ -1,4 +1,3 @@
-/// <reference types="jest" />
 
 // Global test setup
 global.fetch = jest.fn();

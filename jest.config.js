@@ -9,12 +9,17 @@ export default {
   ],
   transform: {
     '^.+\\.ts$': ['ts-jest', {
-      useESM: true
+      useESM: true,
+      tsconfig: {
+        module: 'ESNext',
+        moduleResolution: 'node'
+      }
     }]
   },
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
+  transformIgnorePatterns: [],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/main.ts', // Exclude main entry point
