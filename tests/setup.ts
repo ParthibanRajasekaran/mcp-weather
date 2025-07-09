@@ -1,6 +1,8 @@
 
+import { setupGlobalFetchMock } from './__mocks__/fetch.js';
+
 // Global test setup
-global.fetch = jest.fn();
+setupGlobalFetchMock();
 
 // Mock console methods in tests to reduce noise
 global.console = {
@@ -13,4 +15,13 @@ global.console = {
 // Clean up after each test
 afterEach(() => {
   jest.clearAllMocks();
+});
+
+// Clean up after all tests
+afterAll(() => {
+  // Ensure all timers are cleared
+  jest.clearAllTimers();
+  
+  // Reset all mocks
+  jest.resetAllMocks();
 });

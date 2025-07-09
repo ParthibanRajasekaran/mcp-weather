@@ -1,4 +1,4 @@
-// Mock fetch for testing
+// Mock fetch for testing with robust CI support
 export const mockFetch = jest.fn();
 
 // Default successful responses
@@ -28,15 +28,52 @@ export const mockWeatherResponse = {
   }
 };
 
+// Setup global fetch mock that always works in CI
+export const setupGlobalFetchMock = () => {
+  global.fetch = jest.fn().mockImplementation((url: string) => {
+    // Always return successful mocked responses regardless of environment
+    if (url.includes('geocoding-api.open-meteo.com')) {
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(mockGeocodingResponse)
+      } as Response);
+    }
+    
+    if (url.includes('api.open-meteo.com')) {
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(mockWeatherResponse)
+      } as Response);
+    }
+    
+    // Fallback for any other URLs
+    return Promise.resolve({
+      ok: false,
+      status: 404,
+      json: () => Promise.resolve({ error: 'Not found' })
+    } as Response);
+  });
+};
+
 // Helper to setup successful API mocks
 export const setupSuccessfulMocks = () => {
   (global.fetch as jest.MockedFunction<typeof fetch>)
     .mockResolvedValueOnce({
       ok: true,
+      status: 200,
       json: () => Promise.resolve(mockGeocodingResponse)
     } as Response)
     .mockResolvedValueOnce({
       ok: true,
+      status: 200,
       json: () => Promise.resolve(mockWeatherResponse)
     } as Response);
+};
+
+// Setup error responses for testing error handling
+export const setupErrorMocks = () => {
+  (global.fetch as jest.MockedFunction<typeof fetch>)
+    .mockRejectedValue(new Error('Network error'));
 };

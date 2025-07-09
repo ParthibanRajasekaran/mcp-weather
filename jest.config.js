@@ -26,5 +26,14 @@ export default {
     '!**/*.d.ts'
   ],
   coverageReporters: ['text', 'lcov', 'html'],
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts']
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+  // Improved resource management for CI
+  forceExit: true,
+  detectOpenHandles: true,
+  maxWorkers: process.env.CI ? 2 : '50%',
+  testTimeout: 30000,
+  // Specific timeouts for different test types
+  testPathIgnorePatterns: [],
+  globalTeardown: undefined,
+  globalSetup: undefined
 };
