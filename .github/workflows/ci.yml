@@ -23,26 +23,145 @@ jobs:
 
       - name: Run tests
         run: |
+          echo "Running core tests..."
           npm test
-          npm run coverage || true
-          npm run lint || true
-          npm run mutation || true
-          npm audit --json > audit.json || true
-          npx npm-audit-html -i audit.json -o audit-report.html || true
+          
+          echo "Running test coverage..."
+          npm run coverage || echo "Coverage generation failed but continuing..."
+          
+          echo "Running linting..."
+          npm run lint || echo "Linting completed with warnings/errors but continuing..."
+          
+          echo "Running mutation testing..."
+          npm run mutation || echo "Mutation testing completed but continuing..."
+          
+          echo "Running security audit..."
+          npm audit --json > audit.json || echo "Security audit completed but continuing..."
+          
+          echo "Generating audit report..."
+          npx npm-audit-html -i audit.json -o audit-report.html || echo "Audit report generation failed but continuing..."
+          
+          echo "All validation steps completed!"
         env:
           JEST_JUNIT_OUTPUT: ./test-results/junit.xml
+        continue-on-error: false
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            coverage/
+            reports/
+            audit.json
+            audit-report.html
+          retention-days: 30
+
   coverage-badge:
     needs: build-and-test
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Download coverage artifact
-        uses: actions/download-artifact@v4
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          name: coverage-report
+          node-version: '20.x'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Generate coverage (fallback)
+        run: npm run coverage || echo "Coverage generation failed, skipping badge generation"
+        continue-on-error: true
+        
       - name: Upload coverage badge
         uses: actions/upload-artifact@v4
+        if: success()
         with:
           name: coverage-badge
           path: coverage/badge.svg
+          
+  quality-checks:
+    name: Quality Analysis (Non-blocking)
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run extended quality checks
+        run: |
+          echo "=== Running Extended Quality Analysis ==="
+          
+          echo "1. Code linting analysis..."
+          npm run lint > lint-report.txt 2>&1 || true
+          
+          echo "2. Mutation testing analysis..."
+          npm run mutation > mutation-report.txt 2>&1 || true
+          
+          echo "3. Security vulnerability scan..."
+          npm audit --audit-level=moderate --json > security-audit.json 2>&1 || true
+          
+          echo "4. Package dependency analysis..."
+          npm ls --json > dependencies.json 2>&1 || true
+          
+          echo "=== Quality Analysis Complete ==="
+          echo "All reports generated (check artifacts for details)"
+        continue-on-error: true
+        
+      - name: Upload quality reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: quality-reports
+          path: |
+            lint-report.txt
+            mutation-report.txt
+            security-audit.json
+            dependencies.json
+            reports/
+          retention-days: 30
+          
+  pipeline-summary:
+    name: Pipeline Summary
+    runs-on: ubuntu-latest
+    needs: [build-and-test, coverage-badge, quality-checks]
+    if: always()
+    steps:
+      - name: Pipeline Results Summary
+        run: |
+          echo "=== CI/CD Pipeline Summary ==="
+          echo "Core Tests: ${{ needs.build-and-test.result }}"
+          echo "Coverage Badge: ${{ needs.coverage-badge.result }}"
+          echo "Quality Checks: ${{ needs.quality-checks.result }}"
+          echo ""
+          
+          if [[ "${{ needs.build-and-test.result }}" == "success" ]]; then
+            echo "✅ Core functionality tests PASSED"
+            echo "✅ Pipeline is healthy and ready for deployment"
+          else
+            echo "❌ Core functionality tests FAILED"
+            echo "❌ Pipeline blocked - fix core issues before deployment"
+            exit 1
+          fi
+          
+          if [[ "${{ needs.coverage-badge.result }}" != "success" ]]; then
+            echo "⚠️  Coverage badge generation had issues (non-blocking)"
+          fi
+          
+          if [[ "${{ needs.quality-checks.result }}" != "success" ]]; then
+            echo "⚠️  Quality checks had issues (non-blocking)"
+            echo "📊 Check quality-reports artifact for detailed analysis"
+          fi

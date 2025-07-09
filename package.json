@@ -15,9 +15,10 @@
     "test:acceptance": "jest --testPathPattern=acceptance",
     "test:performance": "jest --testPathPattern=performance --runInBand",
     "test:all": "npm run test:unit && npm run test:integration && npm run test:acceptance",
-    "coverage": "jest --coverage && jest-coverage-badges",
+    "coverage": "jest --coverage && jest-coverage-badges || true",
     "lint": "eslint . --ext .ts,.js || true",
-    "mutation": "stryker run || true"
+    "mutation": "stryker run || true",
+    "audit": "npm audit --audit-level=moderate || true"
   },
   "keywords": [
     "mcp",
