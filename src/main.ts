@@ -34,10 +34,8 @@ server.tool(
 // server.tool("getNews", "Get latest news", NewsSchema, async (input) => { ... });
 // server.tool("getStocks", "Get stock prices", StockSchema, async (input) => { ... });
 
-
-const transport = new StdioServerTransport();
-
 export async function main() {
+    const transport = new StdioServerTransport();
     await server.connect(transport);
 }
 

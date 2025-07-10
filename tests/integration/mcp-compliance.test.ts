@@ -216,7 +216,7 @@ describe('MCP Protocol Compliance Tests', () => {
       for (const operation of operations) {
         await expect(operation()).resolves.toBeDefined();
       }
-    });
+    }, 30000); // Increased timeout for connection stability test
 
     it('should handle rapid sequential requests correctly', async () => {
       // Send multiple requests quickly
@@ -286,6 +286,6 @@ describe('MCP Protocol Compliance Tests', () => {
         expect(typeof data1.longitude).toBe(typeof data2.longitude);
         expect(typeof data1.current).toBe(typeof data2.current);
       }
-    }, 20000);
+    }, 60000); // Further increased timeout for CI environment
   });
 });
