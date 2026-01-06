@@ -39,14 +39,14 @@
     "url": "https://github.com/ParthibanRajasekaran/mcp-weather/issues"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.15.0",
+    "@modelcontextprotocol/sdk": "^1.25.1",
     "zod": "^3.25.74"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
-    "@stryker-mutator/core": "^6.0.0",
-    "@stryker-mutator/jest-runner": "^6.0.0",
-    "@stryker-mutator/typescript-checker": "^6.0.0",
+    "@stryker-mutator/core": "^9.4.0",
+    "@stryker-mutator/jest-runner": "^9.4.0",
+    "@stryker-mutator/typescript-checker": "^9.4.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^8.36.0",
